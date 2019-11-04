@@ -8,12 +8,25 @@ var budgetyController = (function(){
         this.id = id;
         this.description = description;
         this.value = value;
+        this.percentage = -1;
     };
     var Income = function(id,description,value){
         this.id = id;
         this.description = description;
         this.value = value;
     };
+
+    Expense.prototype.calculatePercentage = function(totalInc){
+        if(totalInc>0){
+        this.percentage = Math.round(this.value / totalInc * 100);
+        }
+        else{
+            this.percentage = -1;
+        }
+    }
+    Expense.prototype.getPercentage = function(){
+        return this.percentage;
+    }
 
     var calculateTotal = function(type){
         var sum = 0;
@@ -93,6 +106,18 @@ var budgetyController = (function(){
             }else{
                 data.percentage = -1;
             }
+        },
+
+        calculatePercentages: function(){
+            data.allItems.exp.forEach(function(cur){
+                cur.calculatePercentage(data.allTotals.inc);
+            });
+        },
+        getPercentages: function(){
+            var AllPerc = data.allItems.exp.map(function(cur){
+                return cur.getPercentage();
+            });
+            return AllPerc;
         },
         getBudget:function(){
             return{
@@ -227,6 +252,13 @@ var controller = (function(budgetyCtrl,UiCtrl){
 
 
     };
+    var updatePercentages = function(){
+        budgetyCtrl.calculatePercentages();
+
+        var percentages = budgetyCtrl.getPercentages();
+
+        console.log(percentages)
+    }
 
     var ctrlDeleteItem = function(event){
         var itemId, splitId, type,ID;
@@ -237,7 +269,6 @@ var controller = (function(budgetyCtrl,UiCtrl){
         ID = parseInt(splitId[1]);
 
         budgetyCtrl.deleteItem(type,ID);
-        console.log(itemId);
         UiCtrl.deleteItem(itemId);
         updateBudget();
        // console.log(ID)
@@ -263,6 +294,9 @@ var controller = (function(budgetyCtrl,UiCtrl){
          UiCtrl.clearFields();
                 //update our budget after click
          updateBudget();
+
+         //Update percentages
+         updatePercentages();
     };
         };
     return{
