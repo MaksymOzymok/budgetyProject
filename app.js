@@ -152,7 +152,8 @@ var UiController = (function(){
         budgetIncome : '.budget__income--value',
         budgetExpense : '.budget__expenses--value',
         budgetPercentage: '.budget__expenses--percentage',
-        container: '.container'
+        container: '.container',
+        expensesPercItem: '.item__percentage'
 
     }
 
@@ -216,6 +217,26 @@ var UiController = (function(){
 
 
     },
+    displayPercentages : function(percentages){
+        var elements  = document.querySelectorAll(DOMstrings.expensesPercItem);
+        nodeListForEach = function(list, callback){
+            for(var i = 0; i< list.length;i++){
+                callback(list[i],i);
+            }
+
+        };
+
+
+
+        nodeListForEach(elements,function(current,index){
+            if(percentages[index]>0){
+            current.textContent = percentages[index] + '%';
+            }
+            else{
+                current.textContent = '---';
+            }
+        });
+    },
      getDOMstrings : function(){
          return DOMstrings;
      }
@@ -256,8 +277,7 @@ var controller = (function(budgetyCtrl,UiCtrl){
         budgetyCtrl.calculatePercentages();
 
         var percentages = budgetyCtrl.getPercentages();
-
-        console.log(percentages)
+        UiCtrl.displayPercentages(percentages);
     }
 
     var ctrlDeleteItem = function(event){
