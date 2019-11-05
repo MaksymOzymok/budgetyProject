@@ -127,7 +127,7 @@ var budgetyController = (function(){
                 percentage :data.percentage
             } 
         },
-
+      
         testing : function() {
             console.log(data);
         }
@@ -156,6 +156,26 @@ var UiController = (function(){
         expensesPercItem: '.item__percentage'
 
     }
+    var formatNumber = function(num, type){
+        var numSplit,int,dec, k,h,sign;
+
+        num = Math.abs(num);
+        num = num.toFixed(2);
+
+        numSplit = num.split('.');
+
+        int = numSplit[0];
+        dec = numSplit[1];
+
+        if(int.length>3){
+           int = int.substr(0,int.length-3) + ',' + int.substr(int.length-3, int.length);
+    
+        }
+
+        type==='inc' ? sign = '+' : sign = '-';
+        return  sign + ' '+ int +'.' + dec;
+
+    };
 
     return{
     getInput : function(){
@@ -183,7 +203,7 @@ var UiController = (function(){
 
         newHtml = html.replace('%id%',obj.id);
         newHtml = newHtml.replace('%description%',obj.description);
-        newHtml = newHtml.replace('%value%',obj.value);
+        newHtml = newHtml.replace('%value%', formatNumber (obj.value,type));
 
         document.querySelector(element).insertAdjacentHTML('beforeend',newHtml)
     },
@@ -210,10 +230,12 @@ var UiController = (function(){
     },
     displayBudget : function(obj){
 
-        document.querySelector(DOMstrings.budget).textContent = obj.budget;
-        document.querySelector(DOMstrings.budgetIncome).textContent = obj.totalInc;
-        document.querySelector(DOMstrings.budgetExpense).textContent = obj.totalExp;
-        document.querySelector(DOMstrings.budgetPercentage).textContent = obj.percentage;
+        document.querySelector(DOMstrings.budget).textContent = formatNumber (obj.budget,'inc');
+        document.querySelector(DOMstrings.budgetIncome).textContent = formatNumber(obj.totalInc,'inc');
+        document.querySelector(DOMstrings.budgetExpense).textContent =formatNumber(obj.totalExp,'exp');
+        obj.percentage === -1 ? 
+        document.querySelector(DOMstrings.budgetPercentage).textContent = '---' 
+        : document.querySelector(DOMstrings.budgetPercentage).textContent = obj.percentage;
 
 
     },
