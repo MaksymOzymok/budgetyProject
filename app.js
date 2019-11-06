@@ -3,7 +3,12 @@
 //BUDGET CONTROLLER
 
 var budgetyController = (function(){
+    nodeListForEach = function(list, callback){
+        for(var i = 0; i< list.length;i++){
+            callback(list[i],i);
+        }
 
+    };
     var Expense = function(id,description,value){
         this.id = id;
         this.description = description;
@@ -153,7 +158,8 @@ var UiController = (function(){
         budgetExpense : '.budget__expenses--value',
         budgetPercentage: '.budget__expenses--percentage',
         container: '.container',
-        expensesPercItem: '.item__percentage'
+        expensesPercItem: '.item__percentage',
+        monthLabel :'.budget__title--month'
 
     }
     var formatNumber = function(num, type){
@@ -229,8 +235,12 @@ var UiController = (function(){
 
     },
     displayBudget : function(obj){
-
+        if(obj.budget>=0){ 
         document.querySelector(DOMstrings.budget).textContent = formatNumber (obj.budget,'inc');
+        }
+        else{
+            document.querySelector(DOMstrings.budget).textContent = formatNumber (obj.budget,'exp');
+        }
         document.querySelector(DOMstrings.budgetIncome).textContent = formatNumber(obj.totalInc,'inc');
         document.querySelector(DOMstrings.budgetExpense).textContent =formatNumber(obj.totalExp,'exp');
         obj.percentage === -1 ? 
@@ -241,12 +251,7 @@ var UiController = (function(){
     },
     displayPercentages : function(percentages){
         var elements  = document.querySelectorAll(DOMstrings.expensesPercItem);
-        nodeListForEach = function(list, callback){
-            for(var i = 0; i< list.length;i++){
-                callback(list[i],i);
-            }
-
-        };
+       
 
 
 
@@ -257,6 +262,30 @@ var UiController = (function(){
             else{
                 current.textContent = '---';
             }
+        });
+    },
+    displayDate : function(){
+        var now, year,month,day;
+
+        now = new Date();
+
+        year = now.getFullYear();
+        month = now.getMonth();
+        monthArray = ['January','February','March','April','May','June','July','August','September','October','November','December']
+        day = now.getDay();
+        dayArray = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+        
+        document.querySelector(DOMstrings.monthLabel).textContent =  monthArray[month] + ' ' + year ;
+    }
+    ,
+    changedType :function(){
+
+        elements = document.querySelectorAll (DOMstrings.inputType + ',' + DOMstrings.inputDescription + ',' + DOMstrings.inputValue);
+        document.querySelector(DOMstrings.inputBtn).classList.toggle('red');
+        
+
+        nodeListForEach(elements, function(cur){
+            cur.classList.toggle('red-focus');
         });
     },
      getDOMstrings : function(){
@@ -280,6 +309,8 @@ var controller = (function(budgetyCtrl,UiCtrl){
         }
     });
     document.querySelector(DOM.container).addEventListener('click',ctrlDeleteItem);
+
+    document.querySelector(DOM.inputType).addEventListener('change', UiCtrl.changedType);
     };
 
     var updateBudget = function(){
@@ -344,7 +375,7 @@ var controller = (function(budgetyCtrl,UiCtrl){
     return{
         init: function(){
             console.log('Application started');
-
+            UiCtrl.displayDate();
             UiCtrl.displayBudget({
                 budget:0,
                 totalInc:0,
